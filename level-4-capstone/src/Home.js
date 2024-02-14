@@ -31,7 +31,7 @@ function Home() {
                             <p>Welcome to Star Wars Guru! Here's a guide to help you make the most of it:</p>
                             <ol className='center-list'>
                                 <li>Use the search bar to find information about Star Wars characters, planets, and ships.</li>
-                                <li>Click on any result to view detailed information, including appearances in movies and series.</li>
+                                <li>You can select a category from the dropdown menu above the search bar.</li>
                                 <li>Explore the "Random" button for a surprise Star Wars trivia or fun fact.</li>
                             </ol>
                         </div>

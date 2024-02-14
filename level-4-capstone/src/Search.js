@@ -13,7 +13,7 @@ function Search() {
     const [searchPerformed, setSearchPerformed] = useState(false);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
-
+    
     // Function to fetch images using Unsplash API based on the search query.
     const fetchImages = async (query) => {
         try {
@@ -142,6 +142,8 @@ function Search() {
                 <option value="planets">Planets</option>
                 <option value="starships">Starships</option>
             </select>
+            <br />
+            <br />
             <div style={{ position: 'relative', textAlign: 'center' }}>
                 {/* Input field for search query */}
                 <input
