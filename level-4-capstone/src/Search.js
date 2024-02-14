@@ -13,19 +13,24 @@ function Search() {
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
 
-    const fetchImages = async (result) => {
+    const fetchImages = async (query) => {
         try {
-            const response = await axios.get(`https://api.unsplash.com/search/photos?query=${result.name}&client_id=kf3GJLwitm9etWAcTbKc9NwgIkjrDWxbkDHvgBjxOPmjrUfEbI696e9U`);
+            const response = await axios.get(`https://api.unsplash.com/search/photos?page=1&query=${query}&client_id=TwliGt1t3cHtYaF2KBTxfbLSFJsetRx7hNdkZrEIUL0`);
             const imageUrl = response.data.results[0].urls.regular;
-            setImageUrls(prevImageUrls => ({ ...prevImageUrls, [result.name]: imageUrl }));
+            return imageUrl;
         } catch (error) {
             console.error('Error fetching image:', error);
+            return null;
         }
     };
 
     useEffect(() => {
         if (selectedResult) {
-            fetchImages(selectedResult);
+            const fetchImage = async () => {
+                const imageUrl = await fetchImages(selectedResult.name);
+                setImageUrls(prevImageUrls => ({ ...prevImageUrls, [selectedResult.name]: imageUrl }));
+            };
+            fetchImage();
         }
     }, [selectedResult]);
 
@@ -156,6 +161,13 @@ function Search() {
             ))}
             {selectedResult && (
                 <div className="details">
+                    {imageUrls[selectedResult.name] && (
+                        <img
+                            src={imageUrls[selectedResult.name]}
+                            alt={selectedResult.name}
+                            style={{ maxWidth: '300px', maxHeight: '300px' }}
+                        />
+                    )}
                     <h2>{selectedResult.name}</h2>
                     {searchType === 'people' && (
                         <>
@@ -173,6 +185,7 @@ function Search() {
                             <p>Starships: {selectedResult.starships && selectedResult.starships.length}</p>
                         </>
                     )}
+
                     {searchType === 'planets' && (
                         <>
                             <p>Rotation Period: {selectedResult.rotation_period}</p>
@@ -188,7 +201,7 @@ function Search() {
                     )}
                     {searchType === 'starships' && (
                         <>
-                            <p>Model: {selectedResult.model}</p>
+                             <p>Model: {selectedResult.model}</p>
                             <p>Manufacturer: {selectedResult.manufacturer}</p>
                             <p>Length: {selectedResult.length}</p>
                             <p>Max Atmosphering Speed: {selectedResult.max_atmosphering_speed}</p>
@@ -196,6 +209,10 @@ function Search() {
                             <p>Passengers: {selectedResult.passengers}</p>
                             <p>Hyperdrive Rating: {selectedResult.hyperdrive_rating}</p>
                             <p>MGLT: {selectedResult.MGLT}</p>
+                            <p>Cargo Capacity: {selectedResult.cargo_capacity}</p>
+                            <p>Consumables: {selectedResult.consumables}</p>
+                            <p>Starship Class: {selectedResult.starship_class}</p>
+                            <p>Cost in Credits: {selectedResult.cost_in_credits}</p>
                             <p>Films: {selectedResult.filmsNames && selectedResult.filmsNames.length > 0 ? selectedResult.filmsNames.map((film, index) => <span key={index}>{film}, </span>) : 'Unknown'}</p>
                         </>
                     )}

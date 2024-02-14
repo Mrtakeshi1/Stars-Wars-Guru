@@ -107,20 +107,35 @@ body {
 }
 
 /* Styles for search bar and select */
-.services-container {
+.search-container {
   display: flex;
-  flex-direction: column;
   align-items: center;
+  justify-content: center;
+  margin-top: 5%; /* Adjust margin-top as needed */
 }
 
 .search-input {
-  margin-right: 10px;
   width: 300px;
   padding: 10px;
   border-radius: 5px;
   border: 1px solid #ccc;
-  margin-top: 5%;
 }
+
+.search-button {
+  margin-left: 10px; /* Adjust margin between input and button */
+  padding: 10px 20px; /* Adjust padding as needed */
+  border: none;
+  border-radius: 5px;
+  background-color: #007bff; /* Example button color */
+  color: white;
+  cursor: pointer;
+}
+
+.search-button:hover {
+  background-color: #0056b3; /* Example hover color */
+}
+
+
 
 .select-dropdown {
   position: absolute;
@@ -133,8 +148,18 @@ body {
   max-height: 150px;
   overflow-y: auto;
   z-index: 999;
+  margin-left: 86%;
 }
 
 .select-dropdown option {
   padding: 10px;
 }
+
+/* Inside your CSS stylesheet */
+.result-image {
+  max-width: 100px; /* Example maximum width */
+  max-height: 100px; /* Example maximum height */
+  border-radius: 5px; /* Example border radius */
+  /* Add more styles as needed */
+}
+
