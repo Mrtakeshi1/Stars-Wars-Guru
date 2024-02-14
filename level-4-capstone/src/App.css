@@ -21,6 +21,7 @@ body {
   background-color: black;
   height: 60px;
   padding: 0 20px;
+  z-index: 1000;
 }
 
 .header-title {
@@ -28,6 +29,7 @@ body {
   font-size: 24px;
   font-weight: bold;
   color: white;
+  text-align: center;
 }
 
 .header-title2 {
@@ -35,6 +37,7 @@ body {
   font-size: 35px;
   font-weight: bold;
   color: white;
+  text-align: center;
   margin-top: 5%;
 }
 
@@ -48,112 +51,95 @@ body {
   color: red;
 }
 
-/* Footer styles */
-
 .footer {
+  position: fixed;
+  bottom: 0;
   background-color: black;
   color: white;
-  text-align: center;
-  padding: 10px 0;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 30px;
+  font-size: 12px;
 }
-
-/* Container styles */
 
 .home-container,
 .services-container,
 .about-container {
-  margin: 20px;
+  position: relative;
+  margin: 80px auto;
+  max-width: 1000px;
+  max-height: 900px;
+  background-color: lightcoral;
+  border: solid 3px black;
   padding: 20px;
   border-radius: 10px;
-  background-color: lightcoral;
 }
 
-/* Image styles */
+.home-content {
+  margin-top: 20px;
+}
 
 .image-container {
   display: flex;
   flex-wrap: wrap;
   justify-content: center;
+  margin-top: 20px;
 }
 
 .image-item {
-  flex: 0 0 calc(50% - 20px);
+  flex: 0 0 calc(33.33% - 20px);
+  height: 300px;
+  width: 250px;
   margin: 10px;
   text-align: center;
 }
 
 .image-item img {
-  max-width: 100%;
-  height: auto;
+  width: 100%;
+  height: 100%;
   border: 3px solid white;
   box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.5);
 }
 
-/* Search styles */
-
-.search-container {
+.center {
   text-align: center;
-  margin-top: 20px;
+}
+
+.center-list {
+  list-style-position: inside;
+}
+
+/* Styles for search bar and select */
+.search-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-top: 5%; /* Adjust margin-top as needed */
 }
 
 .search-input {
-  width: 100%;
-  max-width: 300px;
+  width: 300px;
   padding: 10px;
   border-radius: 5px;
   border: 1px solid #ccc;
 }
 
 .search-button {
-  margin-top: 10px;
-  padding: 10px 20px;
+  margin-left: 10px; /* Adjust margin between input and button */
+  padding: 10px 20px; /* Adjust padding as needed */
   border: none;
   border-radius: 5px;
-  background-color: #007bff;
+  background-color: #007bff; /* Example button color */
   color: white;
   cursor: pointer;
 }
 
-/* Media queries for responsiveness */
-
-@media only screen and (max-width: 768px) {
-  .header {
-    padding: 0 10px;
-  }
-
-  .header-title {
-    font-size: 20px;
-  }
-
-  .header-title2 {
-    font-size: 30px;
-  }
-
-  .image-item {
-    flex: 0 0 calc(50% - 10px);
-  }
+.search-button:hover {
+  background-color: #0056b3; /* Example hover color */
 }
 
-@media only screen and (max-width: 480px) {
-  .header-title {
-    font-size: 18px;
-  }
-
-  .header-title2 {
-    font-size: 25px;
-  }
-
-  .image-item {
-    flex: 0 0 calc(100% - 20px);
-  }
-}
-
-/* Cursor */
-* {
-  cursor: url(https://cur.cursors-4u.net/others/oth-1/oth28.cur), auto !important;
-}
-
-/* Select dropdown */
 .select-dropdown {
   position: absolute;
   top: calc(100% + 5px);
@@ -184,3 +170,47 @@ body {
   text-align: center;
 }
 
+/* Media queries for responsiveness */
+
+@media only screen and (max-width: 768px) {
+  .home-container,
+  .services-container,
+  .about-container {
+    margin: 20px;
+  }
+
+  .image-item {
+    flex: 0 0 calc(50% - 20px);
+    height: 200px;
+    width: 150px;
+  }
+}
+
+@media only screen and (max-width: 480px) {
+  .home-container,
+  .services-container,
+  .about-container {
+    margin: 10px;
+    max-width: 100%;
+  }
+
+  .header-title {
+    font-size: 20px;
+  }
+
+  .header-title2 {
+    font-size: 25px;
+  }
+
+  .image-item {
+    flex: 0 0 calc(100% - 20px);
+    height: 150px;
+    width: 100px;
+    margin: 5px;
+  }
+
+  .search-input {
+    width: 100%;
+    max-width: 250px;
+  }
+}
