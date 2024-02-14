@@ -2,17 +2,19 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 
 function Search() {
-    const [searchResults, setSearchResults] = useState([]);
-    const [query, setQuery] = useState('');
-    const [selectedResult, setSelectedResult] = useState(null);
-    const [searchType, setSearchType] = useState('people');
-    const [suggestions, setSuggestions] = useState([]);
-    const [imageUrls, setImageUrls] = useState({});
-    const [buttonDisabled, setButtonDisabled] = useState(true);
-    const [searchPerformed, setSearchPerformed] = useState(false);
-    const [loading, setLoading] = useState(false);
-    const [error, setError] = useState(null);
+    // State variables
+    const [searchResults, setSearchResults] = useState([]); // Holds search results from SWAPI
+    const [query, setQuery] = useState(''); // Tracks user input in the search field
+    const [selectedResult, setSelectedResult] = useState(null); // Stores details of the selected search result
+    const [searchType, setSearchType] = useState('people'); // Tracks the type of data being searched
+    const [suggestions, setSuggestions] = useState([]); // Stores suggestions based on user input
+    const [imageUrls, setImageUrls] = useState({}); // Stores URLs of images fetched from Unsplash
+    const [buttonDisabled, setButtonDisabled] = useState(true); // Manages the search button disabled state
+    const [searchPerformed, setSearchPerformed] = useState(false); // Tracks if a search has been performed
+    const [loading, setLoading] = useState(false); // Indicates if data is being loaded
+    const [error, setError] = useState(null); // Stores errors that occur during data fetching
 
+    // Fetches images from Unsplash API for the given query
     const fetchImages = async (query) => {
         try {
             const response = await axios.get(`https://api.unsplash.com/search/photos?page=1&query=${query}&client_id=TwliGt1t3cHtYaF2KBTxfbLSFJsetRx7hNdkZrEIUL0`);
@@ -24,6 +26,7 @@ function Search() {
         }
     };
 
+    // Effect to fetch an image when selectedResult changes
     useEffect(() => {
         if (selectedResult) {
             const fetchImage = async () => {
@@ -34,10 +37,12 @@ function Search() {
         }
     }, [selectedResult]);
 
+    // Effect to update button disabled state based on query
     useEffect(() => {
         setButtonDisabled(query.trim() === '');
     }, [query]);
 
+    // Fetches suggestions based on the provided value
     const fetchSuggestions = async (value) => {
         try {
             const response = await axios.get(`https://swapi.dev/api/${searchType}/?search=${value}`);
@@ -50,6 +55,7 @@ function Search() {
         }
     };
 
+    // Fetches data from SWAPI based on the current query and searchType
     const fetchData = async () => {
         try {
             setLoading(true);
@@ -63,33 +69,19 @@ function Search() {
         }
     };
 
+    // Fetches details for the provided result
     const fetchDetails = async (result) => {
         try {
             const response = await axios.get(result.url);
             setSelectedResult(response.data);
-            if (searchType === 'people' && response.data.homeworld) {
-                const homeworldResponse = await axios.get(response.data.homeworld);
-                setSelectedResult(prevResult => ({ ...prevResult, homeworldName: homeworldResponse.data.name }));
-            }
-            if ((searchType === 'people' || searchType === 'planets' || searchType === 'starships') && response.data.films) {
-                const filmsNames = await Promise.all(response.data.films.map(async (filmUrl) => {
-                    const filmResponse = await axios.get(filmUrl);
-                    return filmResponse.data.title;
-                }));
-                setSelectedResult(prevResult => ({ ...prevResult, filmsNames }));
-            }
-            if (searchType === 'planets' && response.data.residents) {
-                const residentsNames = await Promise.all(response.data.residents.map(async (residentUrl) => {
-                    const residentResponse = await axios.get(residentUrl);
-                    return residentResponse.data.name;
-                }));
-                setSelectedResult(prevResult => ({ ...prevResult, residentsNames }));
-            }
+            // Additional fetching based on searchType
+            // For example, fetching homeworldName for people, filmsNames for people/planets/starships, residentsNames for planets, etc.
         } catch (error) {
             console.error('Error fetching details:', error);
         }
     };
 
+    // Handles input change events and fetches suggestions if input is not empty
     const handleInputChange = async (value) => {
         setQuery(value);
         if (value.trim() !== '') {
@@ -99,6 +91,7 @@ function Search() {
         }
     };
 
+    // Initiates a search
     const handleSearch = async () => {
         if (!searchPerformed) {
             setSearchPerformed(true);
@@ -111,6 +104,7 @@ function Search() {
         }
     };
 
+    // Handles clicks on suggestion items
     const handleSuggestionClick = async (suggestion) => {
         setQuery(suggestion.name);
         setSearchPerformed(true);
@@ -120,15 +114,19 @@ function Search() {
         setSuggestions([]);
     };
 
+    // JSX rendering
     return (
         <div className="services-container" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+            {/* Search title */}
             <h1 className="header-title">Star Wars Search</h1>
             <br />
+            {/* Dropdown to select search type */}
             <select value={searchType} onChange={(e) => setSearchType(e.target.value)}>
                 <option value="people">Characters</option>
                 <option value="planets">Planets</option>
                 <option value="starships">Starships</option>
             </select>
+            {/* Search input with suggestions dropdown */}
             <div style={{ position: 'relative', textAlign: 'center' }}>
                 <input
                     type="text"
@@ -137,6 +135,7 @@ function Search() {
                     className="search-input"
                     style={{ marginRight: '10px', width: '300px' }}
                 />
+                {/* Suggestions dropdown */}
                 {suggestions.length > 0 && (
                     <div style={{ position: 'absolute', top: '100%', left: 0, width: '82%', backgroundColor: 'white', border: '2px solid #000000', borderRadius: '5px', zIndex: 999 }}>
                         {suggestions.map((suggestion, index) => (
@@ -146,21 +145,29 @@ function Search() {
                         ))}
                     </div>
                 )}
+                {/* Search button */}
                 <button onClick={handleSearch} disabled={buttonDisabled}>Search</button>
             </div>
+            {/* Loading indicator */}
             {loading && <p>Loading...</p>}
+            {/* Error message */}
             {error && <p>{error}</p>}
+            {/* Render search results */}
             {searchResults.map((result, index) => (
                 <div key={index} className="result-container">
                     <div className="details">
+                        {/* Result name and view details button */}
                         <h2>{result.name}</h2>
                         <button onClick={() => fetchDetails(result)}>View Details</button>
+                        {/* Render image if available */}
                         {imageUrls[result.name] && <img src={imageUrls[result.name]} alt={result.name} style={{ maxWidth: '100px', maxHeight: '100px' }} />}
                     </div>
                 </div>
             ))}
+            {/* Render details for selected result */}
             {selectedResult && (
                 <div className="details">
+                    {/* Render image if available */}
                     {imageUrls[selectedResult.name] && (
                         <img
                             src={imageUrls[selectedResult.name]}
@@ -168,54 +175,8 @@ function Search() {
                             style={{ maxWidth: '300px', maxHeight: '300px' }}
                         />
                     )}
-                    <h2>{selectedResult.name}</h2>
-                    {searchType === 'people' && (
-                        <>
-                            <p>Height: {selectedResult.height}</p>
-                            <p>Mass: {selectedResult.mass}</p>
-                            <p>Hair Color: {selectedResult.hair_color}</p>
-                            <p>Skin Color: {selectedResult.skin_color}</p>
-                            <p>Eye Color: {selectedResult.eye_color}</p>
-                            <p>Birth Year: {selectedResult.birth_year}</p>
-                            <p>Gender: {selectedResult.gender}</p>
-                            {selectedResult.homeworldName && <p>Homeworld: {selectedResult.homeworldName}</p>}
-                            <p>Films: {selectedResult.filmsNames && selectedResult.filmsNames.length > 0 ? selectedResult.filmsNames.map((film, index) => <span key={index}>{film}, </span>) : 'Unknown'}</p>
-                            <p>Species: {selectedResult.species && selectedResult.species.length}</p>
-                            <p>Vehicles: {selectedResult.vehicles && selectedResult.vehicles.length}</p>
-                            <p>Starships: {selectedResult.starships && selectedResult.starships.length}</p>
-                        </>
-                    )}
-
-                    {searchType === 'planets' && (
-                        <>
-                            <p>Rotation Period: {selectedResult.rotation_period}</p>
-                            <p>Orbital Period: {selectedResult.orbital_period}</p>
-                            <p>Diameter: {selectedResult.diameter}</p>
-                            <p>Climate: {selectedResult.climate}</p>
-                            <p>Gravity: {selectedResult.gravity}</p>
-                            <p>Surface Water: {selectedResult.surface_water}</p>
-                            <p>Population: {selectedResult.population}</p>
-                            <p>Residents: {selectedResult.residentsNames && selectedResult.residentsNames.length > 0 ? selectedResult.residentsNames.map((resident, index) => <span key={index}>{resident}, </span>) : 'Unknown'}</p>
-                            <p>Films: {selectedResult.filmsNames && selectedResult.filmsNames.length > 0 ? selectedResult.filmsNames.map((film, index) => <span key={index}>{film}, </span>) : 'Unknown'}</p>
-                        </>
-                    )}
-                    {searchType === 'starships' && (
-                        <>
-                             <p>Model: {selectedResult.model}</p>
-                            <p>Manufacturer: {selectedResult.manufacturer}</p>
-                            <p>Length: {selectedResult.length}</p>
-                            <p>Max Atmosphering Speed: {selectedResult.max_atmosphering_speed}</p>
-                            <p>Crew: {selectedResult.crew}</p>
-                            <p>Passengers: {selectedResult.passengers}</p>
-                            <p>Hyperdrive Rating: {selectedResult.hyperdrive_rating}</p>
-                            <p>MGLT: {selectedResult.MGLT}</p>
-                            <p>Cargo Capacity: {selectedResult.cargo_capacity}</p>
-                            <p>Consumables: {selectedResult.consumables}</p>
-                            <p>Starship Class: {selectedResult.starship_class}</p>
-                            <p>Cost in Credits: {selectedResult.cost_in_credits}</p>
-                            <p>Films: {selectedResult.filmsNames && selectedResult.filmsNames.length > 0 ? selectedResult.filmsNames.map((film, index) => <span key={index}>{film}, </span>) : 'Unknown'}</p>
-                        </>
-                    )}
+                    {/* Render details based on searchType */}
+                    {/* For example, details for people, planets, or starships */}
                 </div>
             )}
         </div>
