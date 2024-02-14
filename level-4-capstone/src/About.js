@@ -2,6 +2,10 @@ import React from "react";
 import { useParams, Routes, Route } from "react-router-dom";
 
 function About() {
+    const handlePhoneLinkClick = () => {
+        alert("Calling +1 (415) 555-1234");
+    };
+
     return (
         <div className="about-container">
             <h1 className="header-title">About Star Wars App</h1>
@@ -12,7 +16,7 @@ function About() {
             <section className="contact-info">
                 <h2>Contact Information</h2>
                 <p>Email: <a href="mailto:contact@starwars.com">contact@starwars.com</a></p>
-                <p>Phone: <a href="tel:+14155551234">+1 (415) 555-1234</a></p>
+                <p>Phone: <button onClick={handlePhoneLinkClick} style={{ background: "none", border: "none", color: "blue", textDecoration: "underline", cursor: "pointer" }}>+1 (415) 555-1234</button></p>
                 <p>Address: 123 Skywalker Ranch Rd, San Francisco, CA 94903, United States</p>
             </section>
             <section className="additional-info">

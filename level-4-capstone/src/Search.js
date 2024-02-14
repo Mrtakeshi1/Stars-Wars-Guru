@@ -1,19 +1,41 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 
 function Search() {
     const [searchResults, setSearchResults] = useState([]);
     const [query, setQuery] = useState('');
     const [selectedResult, setSelectedResult] = useState(null);
-    const [films, setFilms] = useState([]);
-    const [vehicles, setVehicles] = useState([]);
-    const [starships, setStarships] = useState([]);
-    const [homeworld, setHomeworld] = useState(null);
+    const [searchType, setSearchType] = useState('people');
     const [suggestions, setSuggestions] = useState([]);
+    const [imageUrls, setImageUrls] = useState({});
+    const [buttonDisabled, setButtonDisabled] = useState(true);
+    const [searchPerformed, setSearchPerformed] = useState(false);
+    const [loading, setLoading] = useState(false);
+    const [error, setError] = useState(null);
+
+    const fetchImages = async (result) => {
+        try {
+            const response = await axios.get(`https://api.unsplash.com/search/photos?query=${result.name}&client_id=kf3GJLwitm9etWAcTbKc9NwgIkjrDWxbkDHvgBjxOPmjrUfEbI696e9U`);
+            const imageUrl = response.data.results[0].urls.regular;
+            setImageUrls(prevImageUrls => ({ ...prevImageUrls, [result.name]: imageUrl }));
+        } catch (error) {
+            console.error('Error fetching image:', error);
+        }
+    };
+
+    useEffect(() => {
+        if (selectedResult) {
+            fetchImages(selectedResult);
+        }
+    }, [selectedResult]);
+
+    useEffect(() => {
+        setButtonDisabled(query.trim() === '');
+    }, [query]);
 
     const fetchSuggestions = async (value) => {
         try {
-            const response = await axios.get(`https://swapi.dev/api/people/?search=${value}`);
+            const response = await axios.get(`https://swapi.dev/api/${searchType}/?search=${value}`);
             const filteredSuggestions = response.data.results.filter(suggestion =>
                 suggestion.name.toLowerCase().startsWith(value.toLowerCase())
             );
@@ -22,33 +44,42 @@ function Search() {
             console.error('Error fetching suggestions:', error);
         }
     };
-    
 
     const fetchData = async () => {
         try {
-            const response = await axios.get(`https://swapi.dev/api/people/?search=${query}`);
+            setLoading(true);
+            const response = await axios.get(`https://swapi.dev/api/${searchType}/?search=${query}`);
             setSearchResults(response.data.results);
+            setLoading(false);
         } catch (error) {
             console.error('Error fetching data:', error);
+            setError('An error occurred while fetching data. Please try again later.');
+            setLoading(false);
         }
     };
 
     const fetchDetails = async (result) => {
         try {
-            const [filmsRes, vehiclesRes, starshipsRes, homeworldRes] = await Promise.all([
-                Promise.all(result.films.map(film => axios.get(film))),
-                Promise.all(result.vehicles.map(vehicle => axios.get(vehicle))),
-                Promise.all(result.starships.map(starship => axios.get(starship))),
-                axios.get(result.homeworld)
-            ]);
-            const filmsData = filmsRes.map(response => response.data);
-            const vehiclesData = vehiclesRes.map(response => response.data);
-            const starshipsData = starshipsRes.map(response => response.data);
-            const homeworldData = homeworldRes.data;
-            setFilms(filmsData);
-            setVehicles(vehiclesData);
-            setStarships(starshipsData);
-            setHomeworld(homeworldData);
+            const response = await axios.get(result.url);
+            setSelectedResult(response.data);
+            if (searchType === 'people' && response.data.homeworld) {
+                const homeworldResponse = await axios.get(response.data.homeworld);
+                setSelectedResult(prevResult => ({ ...prevResult, homeworldName: homeworldResponse.data.name }));
+            }
+            if ((searchType === 'people' || searchType === 'planets' || searchType === 'starships') && response.data.films) {
+                const filmsNames = await Promise.all(response.data.films.map(async (filmUrl) => {
+                    const filmResponse = await axios.get(filmUrl);
+                    return filmResponse.data.title;
+                }));
+                setSelectedResult(prevResult => ({ ...prevResult, filmsNames }));
+            }
+            if (searchType === 'planets' && response.data.residents) {
+                const residentsNames = await Promise.all(response.data.residents.map(async (residentUrl) => {
+                    const residentResponse = await axios.get(residentUrl);
+                    return residentResponse.data.name;
+                }));
+                setSelectedResult(prevResult => ({ ...prevResult, residentsNames }));
+            }
         } catch (error) {
             console.error('Error fetching details:', error);
         }
@@ -64,39 +95,45 @@ function Search() {
     };
 
     const handleSearch = async () => {
-        setSearchResults([]);
-        setSelectedResult(null);
-        setFilms([]);
-        setVehicles([]);
-        setStarships([]);
-        setHomeworld(null);
-        await fetchData();
+        if (!searchPerformed) {
+            setSearchPerformed(true);
+            setSearchResults([]);
+            setSelectedResult(null);
+            setError(null);
+            await fetchData();
+            setQuery('');
+            setSuggestions([]);
+        }
     };
 
     const handleSuggestionClick = async (suggestion) => {
         setQuery(suggestion.name);
+        setSearchPerformed(true);
         setSearchResults([]);
         setSelectedResult(null);
-        setFilms([]);
-        setVehicles([]);
-        setStarships([]);
-        setHomeworld(null);
         await fetchDetails(suggestion);
+        setSuggestions([]);
     };
 
     return (
         <div className="services-container" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-            <h1 className="header-title">Star Wars Characters</h1>
+            <h1 className="header-title">Star Wars Search</h1>
+            <br />
+            <select value={searchType} onChange={(e) => setSearchType(e.target.value)}>
+                <option value="people">Characters</option>
+                <option value="planets">Planets</option>
+                <option value="starships">Starships</option>
+            </select>
             <div style={{ position: 'relative', textAlign: 'center' }}>
                 <input
                     type="text"
                     value={query}
                     onChange={(e) => handleInputChange(e.target.value)}
-                    className="search-input" // Add new class here
+                    className="search-input"
                     style={{ marginRight: '10px', width: '300px' }}
                 />
                 {suggestions.length > 0 && (
-                    <div style={{ position: 'absolute', top: '100%', left: 0, width: '100%', backgroundColor: 'white', border: '1px solid #ccc', zIndex: 999 }}>
+                    <div style={{ position: 'absolute', top: '100%', left: 0, width: '82%', backgroundColor: 'white', border: '2px solid #000000', borderRadius: '5px', zIndex: 999 }}>
                         {suggestions.map((suggestion, index) => (
                             <div key={index} onClick={() => handleSuggestionClick(suggestion)} style={{ padding: '5px', cursor: 'pointer' }}>
                                 {suggestion.name}
@@ -104,45 +141,64 @@ function Search() {
                         ))}
                     </div>
                 )}
-                <button onClick={handleSearch}>Search</button>
+                <button onClick={handleSearch} disabled={buttonDisabled}>Search</button>
             </div>
+            {loading && <p>Loading...</p>}
+            {error && <p>{error}</p>}
             {searchResults.map((result, index) => (
                 <div key={index} className="result-container">
                     <div className="details">
                         <h2>{result.name}</h2>
                         <button onClick={() => fetchDetails(result)}>View Details</button>
+                        {imageUrls[result.name] && <img src={imageUrls[result.name]} alt={result.name} style={{ maxWidth: '100px', maxHeight: '100px' }} />}
                     </div>
                 </div>
             ))}
             {selectedResult && (
                 <div className="details">
                     <h2>{selectedResult.name}</h2>
-                    <p>Height: {selectedResult.height}</p>
-                    <p>Mass: {selectedResult.mass}</p>
-                    <p>Hair Color: {selectedResult.hair_color}</p>
-                    <p>Skin Color: {selectedResult.skin_color}</p>
-                    <p>Eye Color: {selectedResult.eye_color}</p>
-                    <p>Birth Year: {selectedResult.birth_year}</p>
-                    <p>Gender: {selectedResult.gender}</p>
-                    <p>Homeworld: {homeworld ? homeworld.name : 'Loading...'}</p>
-                    <h3>Films:</h3>
-                    <ul>
-                        {films.map((film, index) => (
-                            <li key={index}>{film.title}</li>
-                        ))}
-                    </ul>
-                    <h3>Vehicles:</h3>
-                    <ul>
-                        {vehicles.map((vehicle, index) => (
-                            <li key={index}>{vehicle.name}</li>
-                        ))}
-                    </ul>
-                    <h3>Starships:</h3>
-                    <ul>
-                        {starships.map((starship, index) => (
-                            <li key={index}>{starship.name}</li>
-                        ))}
-                    </ul>
+                    {searchType === 'people' && (
+                        <>
+                            <p>Height: {selectedResult.height}</p>
+                            <p>Mass: {selectedResult.mass}</p>
+                            <p>Hair Color: {selectedResult.hair_color}</p>
+                            <p>Skin Color: {selectedResult.skin_color}</p>
+                            <p>Eye Color: {selectedResult.eye_color}</p>
+                            <p>Birth Year: {selectedResult.birth_year}</p>
+                            <p>Gender: {selectedResult.gender}</p>
+                            {selectedResult.homeworldName && <p>Homeworld: {selectedResult.homeworldName}</p>}
+                            <p>Films: {selectedResult.filmsNames && selectedResult.filmsNames.length > 0 ? selectedResult.filmsNames.map((film, index) => <span key={index}>{film}, </span>) : 'Unknown'}</p>
+                            <p>Species: {selectedResult.species && selectedResult.species.length}</p>
+                            <p>Vehicles: {selectedResult.vehicles && selectedResult.vehicles.length}</p>
+                            <p>Starships: {selectedResult.starships && selectedResult.starships.length}</p>
+                        </>
+                    )}
+                    {searchType === 'planets' && (
+                        <>
+                            <p>Rotation Period: {selectedResult.rotation_period}</p>
+                            <p>Orbital Period: {selectedResult.orbital_period}</p>
+                            <p>Diameter: {selectedResult.diameter}</p>
+                            <p>Climate: {selectedResult.climate}</p>
+                            <p>Gravity: {selectedResult.gravity}</p>
+                            <p>Surface Water: {selectedResult.surface_water}</p>
+                            <p>Population: {selectedResult.population}</p>
+                            <p>Residents: {selectedResult.residentsNames && selectedResult.residentsNames.length > 0 ? selectedResult.residentsNames.map((resident, index) => <span key={index}>{resident}, </span>) : 'Unknown'}</p>
+                            <p>Films: {selectedResult.filmsNames && selectedResult.filmsNames.length > 0 ? selectedResult.filmsNames.map((film, index) => <span key={index}>{film}, </span>) : 'Unknown'}</p>
+                        </>
+                    )}
+                    {searchType === 'starships' && (
+                        <>
+                            <p>Model: {selectedResult.model}</p>
+                            <p>Manufacturer: {selectedResult.manufacturer}</p>
+                            <p>Length: {selectedResult.length}</p>
+                            <p>Max Atmosphering Speed: {selectedResult.max_atmosphering_speed}</p>
+                            <p>Crew: {selectedResult.crew}</p>
+                            <p>Passengers: {selectedResult.passengers}</p>
+                            <p>Hyperdrive Rating: {selectedResult.hyperdrive_rating}</p>
+                            <p>MGLT: {selectedResult.MGLT}</p>
+                            <p>Films: {selectedResult.filmsNames && selectedResult.filmsNames.length > 0 ? selectedResult.filmsNames.map((film, index) => <span key={index}>{film}, </span>) : 'Unknown'}</p>
+                        </>
+                    )}
                 </div>
             )}
         </div>

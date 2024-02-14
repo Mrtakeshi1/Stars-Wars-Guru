@@ -11,14 +11,13 @@ body {
 
 .header {
   display: flex;
-  justify-content: space-between; /* Change justify-content to space-between */
+  justify-content: space-between;
   align-items: center;
   background-color: black;
   height: 60px;
   padding: 0 20px;
   z-index: 1000;
 }
-
 
 .header-title {
   margin: 0;
@@ -37,7 +36,6 @@ body {
   margin-top: 5%;
 }
 
-
 .header-link {
   color: white;
   text-decoration: none;
@@ -46,9 +44,7 @@ body {
 
 .header-link:hover {
   color: red;
-  cursor: url(https://cur.cursors-4u.net/others/oth-1/oth28.cur), auto !important;
 }
-
 
 .footer {
   position: fixed;
@@ -63,7 +59,9 @@ body {
   font-size: 12px;
 }
 
-.home-container, .services-container, .about-container {
+.home-container,
+.services-container,
+.about-container {
   position: relative;
   margin: 80px auto;
   max-width: 1000px;
@@ -86,20 +84,19 @@ body {
 }
 
 .image-item {
-  flex: 0 0 calc(33.33% - 20px); /* Set the width of each item with some spacing */
-  height: 300px; /* Set a fixed height for the container */
+  flex: 0 0 calc(33.33% - 20px);
+  height: 300px;
   width: 250px;
-  margin: 10px; /* Add some margin to create space between items */
+  margin: 10px;
   text-align: center;
 }
 
 .image-item img {
-  width: 100%; /* Set the image width to fill the container */
-  height: 100%; /* Set the image height to fill the container */
+  width: 100%;
+  height: 100%;
   border: 3px solid white;
   box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.5);
 }
-
 
 .center {
   text-align: center;
@@ -107,4 +104,37 @@ body {
 
 .center-list {
   list-style-position: inside;
+}
+
+/* Styles for search bar and select */
+.services-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.search-input {
+  margin-right: 10px;
+  width: 300px;
+  padding: 10px;
+  border-radius: 5px;
+  border: 1px solid #ccc;
+  margin-top: 5%;
+}
+
+.select-dropdown {
+  position: absolute;
+  top: calc(100% + 5px);
+  left: 0;
+  width: 10%;
+  background-color: white;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  max-height: 150px;
+  overflow-y: auto;
+  z-index: 999;
+}
+
+.select-dropdown option {
+  padding: 10px;
 }
