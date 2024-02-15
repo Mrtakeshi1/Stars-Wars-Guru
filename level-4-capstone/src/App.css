@@ -1,13 +1,13 @@
 /* General styles */
 * {
-  box-sizing: border-box;
+  cursor: url(https://cur.cursors-4u.net/others/oth-1/oth28.cur), auto !important;
 }
 
 body {
-  margin: 0;
+  box-sizing: border-box;
   background-image: url(https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExemEwamx4MXV4OHd1dDN3ZzIzOTZrbHFldTFpMWhneHBpMXltem41eCZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/qctkNdYEq5ay0Co5aW/giphy.gif);
-  background-size: cover;
   background-repeat: no-repeat;
+  margin: 0;
   font-family: Arial, sans-serif;
 }
 
@@ -172,6 +172,10 @@ body {
 
 /* Media queries for responsiveness */
 @media only screen and (max-width: 768px) {
+  body {
+    background-size: cover; /* Adjust background size for tablets */
+  }
+
   .home-container,
   .services-container,
   .about-container {
@@ -186,6 +190,10 @@ body {
 }
 
 @media only screen and (max-width: 480px) {
+  body {
+    background-size: cover; /* Adjust background size for phones */
+  }
+
   .home-container,
   .services-container,
   .about-container {
