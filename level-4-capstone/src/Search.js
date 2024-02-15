@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
+import './App.css';
 
 function Search() {
     // State variables for managing search results, query, selected result, search type, suggestions, image URLs, button status, search status, loading status, and error handling.

@@ -7,6 +7,7 @@ body {
   box-sizing: border-box;
   background-image: url(https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExemEwamx4MXV4OHd1dDN3ZzIzOTZrbHFldTFpMWhneHBpMXltem41eCZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/qctkNdYEq5ay0Co5aW/giphy.gif);
   background-repeat: no-repeat;
+  background-size: cover;
   margin: 0;
   font-family: Arial, sans-serif;
 }
@@ -171,9 +172,9 @@ body {
 }
 
 /* Media queries for responsiveness */
-@media only screen and (max-width: 768px) {
+@media only screen and (max-width: 1080px) {
   body {
-    background-size: cover; /* Adjust background size for tablets */
+    background-size: 1080px 990px; /* Adjust background size for tablets */
   }
 
   .home-container,
@@ -191,7 +192,7 @@ body {
 
 @media only screen and (max-width: 480px) {
   body {
-    background-size: cover; /* Adjust background size for phones */
+    background-size: 480px 1180px; /* Adjust background size for phones */
   }
 
   .home-container,
@@ -199,6 +200,7 @@ body {
   .about-container {
     margin: 10px;
     max-width: 100%;
+    max-height: 1300px;
     display: block; /* Change display property to block */
   }
 

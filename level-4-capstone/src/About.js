@@ -1,5 +1,6 @@
 import React from "react";
 import { useParams, Routes, Route } from "react-router-dom";
+import './App.css';
 
 function About() {
     const handlePhoneLinkClick = () => {
